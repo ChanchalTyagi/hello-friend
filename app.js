@@ -120,12 +120,12 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 //end body-parser configuration
 
 //create app server
-var server = app.listen(3000,function (err) { bb
+var server = app.listen(3000,function (err) {
     if(!err)
   console.log("Your server is running at port 3000")
 });
 
-//rest api to get all results are ryeb
+//rest api to get all results
 app.get('/employees', function (req, res) {
    connection.query('select * from chanchal', function (error, results, fields) {
 	  if (error) throw error;
