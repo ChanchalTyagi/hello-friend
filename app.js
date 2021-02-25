@@ -8,13 +8,12 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-
-// default route
 app.get('/', function (req, res) {
     return res.send({ error: true, message: 'hello' })
 });
-// connection configurations
-var dbConn = mysql.createConnection({
+
+// Connection to database MySql
+var db = mysql.createConnection({
     host: 'localhost',
     user: 'chanchal',
     password: 'karmayoga',
@@ -22,33 +21,40 @@ var dbConn = mysql.createConnection({
 });
 
 // connect to database
-dbConn.connect(); 
+db.connect((err) => {
+    if (!err)
+        console.log('DB connection succeded.');
+});
 
-// Retrieve all users 
+//I created a table named crud in database testdb with id,name,email,created_at(date).
+
+// To display all the users present in the database
 app.get('/users', function (req, res) {
     dbConn.query('SELECT * FROM crud', function (error, results, fields) {
         if (error) throw error;
-        return res.send({ error: false, data: results, message: 'users list.' });
+        return res.send({ error: false, data: results, message: 'All Users list.' });
     });
 });
 
-// Retrieve user with id 
+// Retrieve user with given id
 app.get('/user/:id', function (req, res) {
     let user_id = req.params.id;
     if (!user_id) {
-        return res.status(400).send({ error: true, message: 'Please provide user_id' });
+        return res.status(400).send({ error: true, message: 'Please provide user id' });
     }
 
     dbConn.query('SELECT * FROM crud where id=?', user_id, function (error, results, fields) {
         if (error) throw error;
-        return res.send({ error: false, data: results[0], message: 'users list.' });
+        return res.send({ error: false, data: results[0], message: 'All Users list.' });
     });
 
 });
+
+// To add to user with given information
 app.post('/user', function (req, res) {
     let user = req.body.user;
     if (!user) {
-      return res.status(400).send({ error:true, message: 'Please provide user' });
+      return res.status(400).send({ error:true, message: 'Please provide data' });
     }
    dbConn.query("INSERT INTO crud SET ? ", { user: user }, function (error, results, fields) {
   if (error) throw error;
@@ -56,22 +62,7 @@ app.post('/user', function (req, res) {
     });
 });
 
-//  Update user with id
-// app.put('/user', function (req, res) {
-//     let user_id=re.params.id;
-//     let name = req.body.name;
-//     let email=req.body.email;
-//     let date=req.body.created_at;
-//     if (!user_id) {
-//         return res.status(400).send({ error: user, message: 'Please provide user and user_id' });
-//     }
-//     var sql="UPDATE crud SET name = '"+ name +"', email='"+ email +"', created_at='"+ date +"' WHERE id = user_id"
-//     dbConn.query(sql, function (error, results, fields) {
-//         if (error) throw error;
-//         return res.send({ error: false, data: results, message: 'user has been updated successfully.' });
-//     });
-// });
-
+// To update a user with given information
 app.put('/user', function (req, res) {
     let user_id = req.body.user_id;
     let user = req.body.user;
@@ -84,6 +75,7 @@ app.put('/user', function (req, res) {
      });
     });
 
+// To delete a particular user with given id    
 app.delete('/user/:id', function (req, res) {
     let user_id = req.params.id;
     if (!user_id) {
